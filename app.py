@@ -122,7 +122,16 @@ class StudentResource(Resource):
     
 class HealthCheck(Resource):
     def get(self):
-        return {"status": "ok"}, 200
+        try:
+            # Check database connectivity
+            db.session.execute(text("SELECT 1"))
+            return {"status": "ok", "database": "connected"}, 200
+        except OperationalError as e:
+            logger.error(f"Health check failed: Database unreachable. {str(e)}")
+            return {"status": "unhealthy", "database": "disconnected", "error": "Database unreachable"}, 503
+        except Exception as e:
+            logger.error(f"Health check failed: Unexpected error. {str(e)}")
+            return {"status": "unhealthy", "error": str(e)}, 500
 
 # Url routings
 @app.route("/", methods=["GET"])

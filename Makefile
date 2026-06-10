@@ -6,14 +6,15 @@ FLASK = $(VENV)/bin/flask
 APP = app.py
 PORT = 4000
 
-.PHONY: help venv install run dev db clean freeze
+.PHONY: help venv install run dev clean freeze test migrate upgrade init-db
 
 help:
 	@echo "Available commands:"
 	@echo "  make venv      Create virtual environment"
 	@echo "  make install   Install dependencies"
 	@echo "  make run       Run the app"
-	@echo "  make db        Create database tables"
+	@echo "  make dev       Run the app in debug mode"
+	@echo "  make test      Run pytest"
 	@echo "  make clean     Remove venv and cache"
 	@echo "  make freeze    Freeze dependencies to requirements.txt"
 	@echo "  make migrate   Create a new migration"
@@ -33,6 +34,14 @@ install: venv
 # Run app normally
 run:
 	$(PYTHON) $(APP)
+
+# Run app in debug mode
+dev:
+	FLASK_APP=$(APP) FLASK_DEBUG=1 $(FLASK) run --port $(PORT)
+
+# Run tests
+test:
+	$(VENV)/bin/pytest
 
 # Cleanup
 clean:
