@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from flask import Flask , render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, fields, reqparse, Resource, marshal_with, abort
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError, OperationalError
 from flask_migrate import Migrate
 
 # Load environment variables
