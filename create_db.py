@@ -1,5 +1,5 @@
-# support/create_db.py
-from api import app, db
+from app import db, app
+
 
 with app.app_context():
     db.create_all()
