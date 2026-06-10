@@ -9,3 +9,9 @@ __pycache__/
 *.log
 *.bak
 *.swp
+instance/
+.mypy_cache/
+.pytest_cache/
+migrations/
+.vscode/
+.env/

@@ -1,9 +1,23 @@
 # importing the necessary libraries
+import os
+import logging
+from dotenv import load_dotenv
+
 from flask import Flask , render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, fields, reqparse, Resource, marshal_with, abort
 from sqlalchemy.exc import IntegrityError
+from flask_migrate import Migrate
 
+# Load environment variables
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 # creating the Flask app
 app = Flask(__name__)
@@ -12,10 +26,11 @@ app = Flask(__name__)
 api = Api(app)
 
 # data Base
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 db = SQLAlchemy()
 db.init_app(app)
-
+migrate = Migrate(app, db)
 
 # model for DataBase
 class StudentModel(db.Model):
@@ -47,6 +62,7 @@ studentFields = {
 class StudentResource(Resource):
     @marshal_with(studentFields)
     def get(self, id=None):
+        logger.info(f"Fetching student with id={id}")
         # Get single student
         if id is not None:
             student = db.session.get(StudentModel, id)
@@ -55,17 +71,21 @@ class StudentResource(Resource):
             return student
         
         # Get all students
+        logger.info("Fetching all students")
         students = StudentModel.query.all()
         return students
     
     @marshal_with(studentFields)
     def post(self):
         args = student_args.parse_args()
+        logger.info(f"Creating student with email={args['email']}")
         student = StudentModel(name=args["name"], email=args["email"], age=args["age"])
         db.session.add(student)
         try:
             db.session.commit()
+            logger.info(f"Student created with id={student.id}")
         except IntegrityError:
+            logger.error("Email already exists")
             db.session.rollback()
             abort(400, message="Email already exists")
         return student, 201
@@ -80,6 +100,7 @@ class StudentResource(Resource):
         student.email = args["email"]
         student.age = args["age"]
         try:
+            logger.info(f"Updating student with id={id}")
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
@@ -92,10 +113,11 @@ class StudentResource(Resource):
         if not student:
             abort(404, message="Student not found")
         db.session.delete(student)
+        logger.info(f"Deleting student with id={id}")
         db.session.commit()
         return "deleted", 204
     
-class healthcheck(Resource):
+class HealthCheck(Resource):
     def get(self):
         return {"status": "ok"}, 200
 
@@ -105,16 +127,18 @@ def home():
     return render_template("home.html")
 
 # API endpoints
+# API endpoints
 api.add_resource(
     StudentResource,
     "/v1/api/students/",
     "/v1/api/students/<int:id>",
+)
 
-api.add_resource(healthcheck, "/v1/api/healthcheck/")
+api.add_resource(
+    HealthCheck,
+    "/v1/api/healthcheck/",
 )
 
 # app runner
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(port=4000, debug=True)

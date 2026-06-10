@@ -15,7 +15,12 @@ help:
 	@echo "  make run       Run the app"
 	@echo "  make db        Create database tables"
 	@echo "  make clean     Remove venv and cache"
-
+	@echo "  make freeze    Freeze dependencies to requirements.txt"
+	@echo "  make migrate   Create a new migration"
+	@echo "  make upgrade   Apply migrations to the database"
+	@echo "  make init-db   Initialize the migration directory"
+	@echo "  make help      Show this help message"
+	
 # Create virtual environment
 venv:
 	python3 -m venv $(VENV)
@@ -35,3 +40,12 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 	rm -f database.db
+
+migrate:
+	FLASK_APP=$(APP) $(FLASK) db migrate -m "auto migration"
+
+upgrade:
+	FLASK_APP=$(APP) $(FLASK) db upgrade
+
+init-db:
+	FLASK_APP=$(APP) $(FLASK) db init
