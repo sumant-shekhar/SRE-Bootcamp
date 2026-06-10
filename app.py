@@ -94,6 +94,10 @@ class StudentResource(Resource):
         db.session.delete(student)
         db.session.commit()
         return "deleted", 204
+    
+class healthcheck(Resource):
+    def get(self):
+        return {"status": "ok"}, 200
 
 # Url routings
 @app.route("/", methods=["GET"])
@@ -105,6 +109,8 @@ api.add_resource(
     StudentResource,
     "/v1/api/students/",
     "/v1/api/students/<int:id>",
+
+api.add_resource(healthcheck, "/v1/api/healthcheck/")
 )
 
 # app runner
