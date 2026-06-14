@@ -1,7 +1,7 @@
 import pytest
 from app import app, db
 
-# ---------- FIXED TEST CLIENT ----------
+# TESTS FOR STUDENT API ENDPOINTS
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
@@ -17,8 +17,7 @@ def client():
         with app.app_context():
             db.drop_all()
 
-
-# ---------- TEST: CREATE STUDENT ----------
+# CREATE STUDENT
 def test_create_student(client):
     response = client.post("/v1/api/students/", json={
         "name": "John",
@@ -30,7 +29,7 @@ def test_create_student(client):
     assert response.json["email"] == "john@test.com"
 
 
-# ---------- TEST: GET ALL ----------
+# GET ALL STUDENTS
 def test_get_students(client):
     client.post("/v1/api/students/", json={
         "name": "John",
@@ -44,7 +43,7 @@ def test_get_students(client):
     assert len(response.json) >= 1
 
 
-# ---------- TEST: GET ONE ----------
+# GET ONE STUDENT
 def test_get_single_student(client):
     res = client.post("/v1/api/students/", json={
         "name": "John",
@@ -60,7 +59,7 @@ def test_get_single_student(client):
     assert response.json["id"] == student_id
 
 
-# ---------- TEST: DELETE ----------
+# DELETE STUDENT
 def test_delete_student(client):
     res = client.post("/v1/api/students/", json={
         "name": "John",
