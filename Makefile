@@ -6,44 +6,43 @@ FLASK = $(VENV)/bin/flask
 APP = app.py
 PORT = 4000
 
-.PHONY: help venv install run dev clean freeze test migrate upgrade init-db
+# Docker Milestone Additions 
+VERSION ?= 1.0.0
+IMAGE_NAME := rest-api-service
+CONTAINER_NAME := rest-api-app
+
+.PHONY: help venv install run dev clean freeze test migrate upgrade init-db docker-build docker-run docker-stop
 
 help:
 	@echo "Available commands:"
-	@echo "  make venv      Create virtual environment"
-	@echo "  make install   Install dependencies"
-	@echo "  make run       Run the app"
-	@echo "  make dev       Run the app in debug mode"
-	@echo "  make test      Run pytest"
-	@echo "  make clean     Remove venv and cache"
-	@echo "  make freeze    Freeze dependencies to requirements.txt"
-	@echo "  make migrate   Create a new migration"
-	@echo "  make upgrade   Apply migrations to the database"
-	@echo "  make init-db   Initialize the migration directory"
-	@echo "  make help      Show this help message"
+	@echo "  make venv         Create virtual environment"
+	@echo "  make install      Install dependencies"
+	@echo "  make run          Run the app"
+	@echo "  make test         Run pytest"
+	@echo "  make clean        Remove venv and cache"
+	@echo "  make freeze       Freeze dependencies to requirements.txt"
+	@echo "  make migrate      Create a new migration"
+	@echo "  make upgrade      Apply migrations to the database"
+	@echo "  make init-db      Initialize the migration directory"
+	@echo "  make docker-build Build the multi-stage Docker image with SemVer"
+	@echo "  make docker-run   Run container with environment variable injection"
+	@echo "  make docker-stop  Stop and remove the running container"
+	@echo "  make help         Show this help message"
 	
-# Create virtual environment
+
 venv:
 	python3 -m venv $(VENV)
 
-# Install dependencies
 install: venv
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 
-# Run app normally
 run:
 	$(PYTHON) $(APP)
 
-# Run app in debug mode
-dev:
-	FLASK_APP=$(APP) FLASK_DEBUG=1 $(FLASK) run --port $(PORT)
-
-# Run tests
 test:
 	$(VENV)/bin/pytest
 
-# Cleanup
 clean:
 	rm -rf $(VENV)
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -58,3 +57,18 @@ upgrade:
 
 init-db:
 	FLASK_APP=$(APP) $(FLASK) db init
+
+docker-build:
+	docker build -t $(IMAGE_NAME):$(VERSION) .
+
+docker-run:
+	docker run -d \
+		--name $(CONTAINER_NAME) \
+		-p $(PORT):$(PORT) \
+		--env-file .env \
+		-e FLASK_APP=$(APP) \
+		$(IMAGE_NAME):$(VERSION)
+
+docker-stop:
+	docker stop $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || true
