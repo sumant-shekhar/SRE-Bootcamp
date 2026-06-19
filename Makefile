@@ -1,34 +1,31 @@
-# Variables
-VENV = .venv
-PYTHON = $(VENV)/bin/python
-PIP = $(VENV)/bin/pip
-FLASK = $(VENV)/bin/flask
-APP = app.py
-PORT = 4000
-
-# Docker Milestone Additions 
 VERSION ?= 1.0.0
 IMAGE_NAME := rest-api-service
 CONTAINER_NAME := rest-api-app
 
-.PHONY: help venv install run dev clean freeze test migrate upgrade init-db docker-build docker-run docker-stop
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+PIP := $(VENV)/bin/pip
+FLASK := $(VENV)/bin/flask
+
+APP := app.py
+PORT := 4000
+
+.PHONY: help venv install run test clean \
+	init-db migrate upgrade \
+	docker-build docker-run docker-stop
 
 help:
 	@echo "Available commands:"
-	@echo "  make venv         Create virtual environment"
-	@echo "  make install      Install dependencies"
-	@echo "  make run          Run the app"
-	@echo "  make test         Run pytest"
-	@echo "  make clean        Remove venv and cache"
-	@echo "  make freeze       Freeze dependencies to requirements.txt"
-	@echo "  make migrate      Create a new migration"
-	@echo "  make upgrade      Apply migrations to the database"
-	@echo "  make init-db      Initialize the migration directory"
-	@echo "  make docker-build Build the multi-stage Docker image with SemVer"
-	@echo "  make docker-run   Run container with environment variable injection"
-	@echo "  make docker-stop  Stop and remove the running container"
-	@echo "  make help         Show this help message"
-	
+	@echo "  make install       Install dependencies"
+	@echo "  make run           Run application"
+	@echo "  make test          Run tests"
+	@echo "  make clean         Remove virtual environment"
+	@echo "  make init-db       Initialize migrations"
+	@echo "  make migrate       Create migration"
+	@echo "  make upgrade       Apply migrations"
+	@echo "  make docker-build  Build Docker image"
+	@echo "  make docker-run    Run Docker container"
+	@echo "  make docker-stop   Stop Docker container"
 
 venv:
 	python3 -m venv $(VENV)
@@ -41,13 +38,10 @@ run:
 	$(PYTHON) $(APP)
 
 test:
-	$(VENV)/bin/pytest
+	$(VENV)/bin/pytest -v
 
-clean:
-	rm -rf $(VENV)
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
-	rm -f database.db
+init-db:
+	FLASK_APP=$(APP) $(FLASK) db init
 
 migrate:
 	FLASK_APP=$(APP) $(FLASK) db migrate -m "auto migration"
@@ -55,8 +49,10 @@ migrate:
 upgrade:
 	FLASK_APP=$(APP) $(FLASK) db upgrade
 
-init-db:
-	FLASK_APP=$(APP) $(FLASK) db init
+clean:
+	rm -rf $(VENV)
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(VERSION) .
@@ -66,9 +62,8 @@ docker-run:
 		--name $(CONTAINER_NAME) \
 		-p $(PORT):$(PORT) \
 		--env-file .env \
-		-e FLASK_APP=$(APP) \
 		$(IMAGE_NAME):$(VERSION)
 
 docker-stop:
 	docker stop $(CONTAINER_NAME) || true
-	docker rm $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || False

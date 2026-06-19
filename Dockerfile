@@ -1,26 +1,30 @@
-FROM python:3.8-alpine
+# Build stage
+FROM python:3.11-slim AS builder
 
-# Install build dependencies
-RUN apk add --no-cache make gcc musl-dev libffi-dev postgresql-dev
-
-# working directory
 WORKDIR /app
 
-# requirements and Makefile
-COPY requirements.txt Makefile ./
+COPY requirements.txt .
 
-# venv and dependencies
-RUN make venv && make install
+RUN python -m venv /opt/venv
 
-# main code
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Runtime stage
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY . .
 
-# script permissions
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x entrypoint.sh
 
-# port
-EXPOSE 5000
+EXPOSE 4000
 
-# entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

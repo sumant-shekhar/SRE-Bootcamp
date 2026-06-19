@@ -2,118 +2,290 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A robust, self-paced SRE roadmap project designed to bridge the gap between local development and production-grade reliability. This project provides a standard Flask REST API for managing student records, serving as a foundation for implementing SRE practices like CI/CD, monitoring, containerization, and orchestration.
+This project provides a standard Flask REST API for managing student records, serving as a foundation for implementing SRE practices such as CI/CD, monitoring, containerization, and orchestration.
+
+---
 
 ## Description
 
-This project is a Student Management System built with Python and Flask. It provides a full set of CRUD (Create, Read, Update, Delete) operations via a RESTful API. 
+This project is a Student Management System built with Python and Flask. It provides a complete set of CRUD (Create, Read, Update, Delete) operations through a RESTful API.
 
-**Key Features:**
-- **RESTful API:** Clean and versioned endpoints (`/v1/api/...`).
-- **Database Integration:** Uses SQLAlchemy with SQLite (default) and support for PostgreSQL/MySQL via environment variables.
-- **Migrations:** Managed database schema changes using Flask-Migrate (Alembic).
-- **Testing:** Comprehensive unit and integration tests using Pytest.
-- **Operational Ready:** Includes health check endpoints and logging.
+### Key Features
+
+* RESTful API with versioned endpoints (`/v1/api/...`)
+* Student record management with CRUD operations
+* SQLAlchemy ORM integration
+* Database migrations using Flask-Migrate (Alembic)
+* SQLite support by default
+* Environment-based database configuration
+* Health check endpoint for operational readiness
+* Multi-stage Docker build for optimized image size
+* Runtime environment variable injection
+* Semantic Versioning (SemVer) for Docker image tagging
+
+---
 
 ## Installation
 
-This project uses a `Makefile` to simplify setup.
-
 ### Prerequisites
-- Python 3.8+
-- `pip` and `venv`
 
-### Setup Steps
+* Python 3.8+
+* pip
+* venv
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/sumant-shekhar/SRE-Bootcamp.git
-   cd SRE-Bootcamp
-   ```
+### Clone the Repository
 
-2. **Install dependencies:**
-   This will create a virtual environment and install all required packages.
-   ```bash
-   make install
-   ```
+```bash
+git clone https://github.com/sumant-shekhar/SRE-Bootcamp.git
+cd SRE-Bootcamp
+```
 
-3. **Initialize the database:**
-   ```bash
-   make init-db   # Only for the first time
-   make migrate   # Generate migration scripts
-   make upgrade   # Apply migrations to database
-   ```
+### Install Dependencies
+
+```bash
+make install
+```
+
+### Initialize Database
+
+Run these commands the first time only:
+
+```bash
+make init-db
+make migrate
+make upgrade
+```
+
+---
 
 ## Usage
 
-### Running the Application
+### Run the Application
 
-To start the development server:
 ```bash
 make run
 ```
-The API will be available at `http://127.0.0.1:4000`.
 
-### API Endpoints
+The API will be available at:
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `GET` | `/v1/api/students/` | List all students |
-| `GET` | `/v1/api/students/<id>` | Get details of a specific student |
-| `POST` | `/v1/api/students/` | Create a new student |
-| `PUT` | `/v1/api/students/<id>` | Update an existing student |
-| `DELETE` | `/v1/api/students/<id>` | Remove a student record |
-| `GET` | `/v1/api/healthcheck/` | Service health status |
-
-### Example Requests
-
-**Create a Student:**
-```bash
-curl -X POST http://127.0.0.1:4000/v1/api/students/ \
-     -H "Content-Type: application/json" \
-     -d '{"name": "John Doe", "email": "john.doe@example.com", "age": 21}'
+```text
+http://127.0.0.1:4000
 ```
 
-**Get All Students:**
+---
+
+## Docker Usage
+
+### Build Docker Image
+
+Build using semantic version tags:
+
+```bash
+make docker-build VERSION=1.0.0
+```
+
+Or manually:
+
+```bash
+docker build -t rest-api-service:1.0.0 .
+```
+
+### Run Docker Container
+
+Using Makefile:
+
+```bash
+make docker-run
+```
+
+Or manually:
+
+```bash
+docker run \
+  --env-file .env \
+  -p 4000:4000 \
+  rest-api-service:1.0.0
+```
+
+### Inject Environment Variables
+
+Using an environment file:
+
+```bash
+docker run \
+  --env-file .env \
+  -p 4000:4000 \
+  rest-api-service:1.0.0
+```
+
+Or individual variables:
+
+```bash
+docker run \
+  -e DATABASE_URL=sqlite:///database.db \
+  -e FLASK_ENV=production \
+  -p 4000:4000 \
+  rest-api-service:1.0.0
+```
+
+### Stop Container
+
+```bash
+make docker-stop
+```
+
+### Verify Container
+
+```bash
+curl http://localhost:4000/v1/api/healthcheck/
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint                | Description           |
+| ------ | ----------------------- | --------------------- |
+| GET    | `/v1/api/students/`     | List all students     |
+| GET    | `/v1/api/students/<id>` | Get a student by ID   |
+| POST   | `/v1/api/students/`     | Create a student      |
+| PUT    | `/v1/api/students/<id>` | Update a student      |
+| DELETE | `/v1/api/students/<id>` | Delete a student      |
+| GET    | `/v1/api/healthcheck/`  | Health check endpoint |
+
+---
+
+## Example Requests
+
+### Create a Student
+
+```bash
+curl -X POST http://127.0.0.1:4000/v1/api/students/ \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "age": 21
+}'
+```
+
+### Get All Students
+
 ```bash
 curl http://127.0.0.1:4000/v1/api/students/
 ```
 
-### Running Tests
+---
+
+## Makefile Commands
+
 ```bash
-pytest
+make help
 ```
+
+Available commands include:
+
+```text
+make install
+make run
+make test
+make migrate
+make upgrade
+make init-db
+make docker-build
+make docker-run
+make docker-stop
+make clean
+```
+
+---
+
+## Environment Variables
+
+Example `.env` file:
+
+```env
+FLASK_APP=app.py
+FLASK_ENV=production
+DATABASE_URL=sqlite:///database.db
+```
+
+These values are injected at container runtime and are not baked into the Docker image.
+
+---
+
+## Image Optimization
+
+The Docker image uses:
+
+* Multi-stage builds
+* Minimal runtime image
+* Dependency caching
+* `.dockerignore` exclusions
+* SemVer image tagging
+
+These measures reduce image size and improve deployment efficiency.
+
+---
 
 ## Support
 
-For support, please open an issue in the GitHub repository or contact the maintainers directly.
+For support, please open an issue in the GitHub repository.
+
+---
 
 ## Roadmap
 
-This project is designed to evolve into a full SRE showcase. Future steps include:
-- [ ] **Dockerization:** Create Dockerfiles and docker-compose for easy orchestration.
-- [ ] **CI/CD Pipeline:** Implement GitHub Actions for automated testing and deployment.
-- [ ] **Monitoring:** Integrate Prometheus and Grafana for metrics visualization.
-- [ ] **Logging:** Centralized logging with ELK or Loki.
-- [ ] **Infrastructure as Code:** Deploy using Terraform or Pulumi.
+* [x] Dockerization with multi-stage builds
+* [x] Runtime environment variable injection
+* [x] Semantic Versioning for Docker images
+* [ ] CI/CD pipeline using GitHub Actions
+* [ ] Monitoring with Prometheus and Grafana
+* [ ] Centralized logging with ELK or Loki
+* [ ] Kubernetes deployment
+* [ ] Infrastructure as Code with Terraform
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
-1. Fork the Project.
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the Branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
+1. Fork the repository
+2. Create a feature branch
 
-## Authors and Acknowledgment
+```bash
+git checkout -b feature/my-feature
+```
 
-- **Sumant Shekhar** - *Initial work* - [Sumant-Shekhar](https://github.com/Sumant-Shekhar)
+3. Commit your changes
+
+```bash
+git commit -m "Add feature"
+```
+
+4. Push your branch
+
+```bash
+git push origin feature/my-feature
+```
+
+5. Open a Pull Request
+
+---
+
+## Author
+
+**Sumant Shekhar**
+
+GitHub: https://github.com/Sumant-Shekhar
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
 
 ## Project Status
 
-This project is currently in active development as part of the SRE Bootcamp series.
+This project is actively maintained as part of the SRE Bootcamp learning roadmap and continues to evolve with production-focused DevOps and SRE practices.
