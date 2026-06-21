@@ -31,7 +31,7 @@ api = Api(app)
 
 # data Base
 
-# Configure SQLite database
+# Configure PostgreSQL database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -139,6 +139,10 @@ class HealthCheck(Resource):
             return {"status": "unhealthy", "error": str(e)}, 500
 
 # Url routings
+@app.route("/list", methods=["GET"])
+def list_students():
+    return render_template("list.html", students=StudentModel.query.all())
+
 @app.route("/", methods=["GET"])
 def home():
     return render_template("home.html")
@@ -155,6 +159,8 @@ api.add_resource(
     HealthCheck,
     "/v1/api/healthcheck/",
 )
+
+
 
 # app runner
 if __name__ == "__main__":
