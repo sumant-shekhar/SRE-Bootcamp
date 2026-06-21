@@ -15,3 +15,5 @@ instance/
 migrations/
 .vscode/
 .env/
+data/
+database.ini

@@ -40,6 +40,18 @@ git clone https://github.com/sumant-shekhar/SRE-Bootcamp.git
 cd SRE-Bootcamp
 ```
 
+### DataBase PostgreSQL
+Create File name `database.ini` "info format"<br>
+user can be default system wide **postgres** "But I recommend create 1 superuser and DB"
+[Detailed Doc.](https://neon.com/postgresql/python/connect)
+
+```bash
+[postgresql]
+host=``localhost or IP address``
+database=`DataBase name`
+user=`PostgreSQl username`
+password=`User Password`
+```
 ### Install Dependencies
 
 ```bash

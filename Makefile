@@ -1,5 +1,5 @@
 VERSION ?= 1.0.0
-IMAGE_NAME := rest-api-service
+IMAGE_NAME := rest-api
 CONTAINER_NAME := rest-api-app
 
 VENV := .venv
@@ -66,4 +66,4 @@ docker-run:
 
 docker-stop:
 	docker stop $(CONTAINER_NAME) || true
-	docker rm $(CONTAINER_NAME) || False
+	docker rm $(CONTAINER_NAME) || true

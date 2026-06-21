@@ -9,10 +9,13 @@ from flask_restful import Api, fields, reqparse, Resource, marshal_with, abort
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask_migrate import Migrate
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from config import load_config
 
 # Load environment variables
 load_dotenv()
-
+db_config = load_config()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
@@ -28,10 +31,11 @@ api = Api(app)
 
 # data Base
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///database.db"
-)
+# Configure SQLite database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Create SQLAlchemy instance
 db = SQLAlchemy()
 db.init_app(app)
 migrate = Migrate(app, db)
