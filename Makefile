@@ -26,6 +26,10 @@ help:
 	@echo "  make docker-build  Build Docker image"
 	@echo "  make docker-run    Run Docker container"
 	@echo "  make docker-stop   Stop Docker container"
+	@echo "  make docker-compose up   Build Docker containers"
+	@echo "  make docker-compose down   Destroy Docker containers"
+	@echo "  make docker-compose start   Start Docker containers"
+	@echo "  make docker-compose stop   Stop Docker containers"
 
 venv:
 	python3 -m venv $(VENV)
@@ -67,3 +71,15 @@ docker-run:
 docker-stop:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
+
+docker-compose up:
+	docker-compose up -d --build
+
+docker-compose down:
+	docker-compose down 
+
+docker-compose start:
+	docker-compose start
+
+docker-compose stop:
+	docker-compose stop

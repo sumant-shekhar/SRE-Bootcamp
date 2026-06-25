@@ -15,7 +15,7 @@ from config import load_config
 
 # Load environment variables
 load_dotenv()
-db_config = load_config()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
@@ -32,7 +32,15 @@ api = Api(app)
 # data Base
 
 # Configure PostgreSQL database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+db_config = load_config()
+
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    f"postgresql://{db_config['user']}:"
+    f"{db_config['password']}@"
+    f"{db_config['host']}:"
+    f"{db_config['port']}/"
+    f"{db_config['database']}"
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Create SQLAlchemy instance

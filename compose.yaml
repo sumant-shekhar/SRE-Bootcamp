@@ -1,27 +1,33 @@
-version: '3.8'
-
 services:
-  web:
-    build: .
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sre-bootcamp-app
     ports:
       - "4000:4000"
-    environment:
-      - POSTGRES_DB=srebootcamp
-      - POSTGRES_USER=suman
-      - POSTGRES_PASSWORD=admin
+    env_file:
+      - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
   db:
     image: postgres:18.4-alpine
+    container_name: sre-bootcamp-db
     environment:
-      - POSTGRES_DB=srebootcamp
-      - POSTGRES_USER=suman
-      - POSTGRES_PASSWORD=admin
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: srebootcamp
+      POSTGRES_USER: suman
+      POSTGRES_PASSWORD: admin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U suman -d srebootcamp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
   postgres_data:
