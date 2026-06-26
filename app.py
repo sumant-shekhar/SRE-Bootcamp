@@ -9,9 +9,6 @@ from flask_restful import Api, fields, reqparse, Resource, marshal_with, abort
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask_migrate import Migrate
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from config import load_config
 
 load_dotenv()
 
@@ -27,9 +24,6 @@ app = Flask(__name__)
 
 # creating the API object
 api = Api(app)
-
-# data Base
-import os
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -122,7 +116,7 @@ class StudentResource(Resource):
         db.session.delete(student)
         logger.info(f"Deleting student with id={id}")
         db.session.commit()
-        return "deleted", 204
+        return '', 204
     
 class HealthCheck(Resource):
     def get(self):

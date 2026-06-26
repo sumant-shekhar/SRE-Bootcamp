@@ -23,5 +23,6 @@ pytz==2026.2
 six==1.17.0
 SQLAlchemy==2.0.50
 typing_extensions==4.15.0
+waitress==3.0.2
 watchdog==6.0.0
 Werkzeug==3.1.8

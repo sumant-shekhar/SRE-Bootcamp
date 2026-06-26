@@ -27,6 +27,12 @@ jobs:
           ${{ secrets.ENV_FILE }}
           EOF
 
+      - name: Create database.ini file
+        run: |
+          cat <<EOF > database.ini
+          ${{ secrets.DATABASE_FILE }}
+          EOF 
+
       - name: Docker Deploy
         run: docker compose up -d --build
 

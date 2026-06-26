@@ -6,6 +6,7 @@ services:
     container_name: sre-bootcamp-app
     ports:
       - "4000:4000"
+      - "5432:5432"
     environment:
       DB_USER: suman
       DB_PASSWORD: admin
