@@ -24,6 +24,9 @@ jobs:
       - name: Create .env file
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
+      - name: Create database.ini file
+        run: echo "${{ secrets.DATABASE_FILE }}" > database.ini
+
       - name: Docker Deploy
         run: docker compose up -d --build
 
