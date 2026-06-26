@@ -22,10 +22,16 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Create .env file
-        run: echo "${{ secrets.ENV_FILE }}" > .env
+        run: |
+          cat <<EOF > .env
+          ${{ secrets.ENV_FILE }}
+          EOF
 
       - name: Create database.ini file
-        run: echo "${{ secrets.DATABASE_FILE }}" > database.ini
+        run: |
+          cat <<EOF > database.ini
+          ${{ secrets.DATABASE_FILE }}
+          EOF 
 
       - name: Docker Deploy
         run: docker compose up -d --build

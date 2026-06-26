@@ -6,8 +6,13 @@ services:
     container_name: sre-bootcamp-app
     ports:
       - "4000:4000"
-    env_file:
-      - .env
+    environment:
+      DB_USER: suman
+      DB_PASSWORD: admin
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: srebootcamp
+      DATABASE_URL: postgresql://suman:admin@db:5432/srebootcamp
     depends_on:
       db:
         condition: service_healthy
