@@ -12,24 +12,27 @@ PORT := 4000
 
 .PHONY: help venv install run test clean \
 	init-db migrate upgrade \
-	docker-build docker-run docker-stop
+	docker-build docker-run docker-stop \
+	docker-compose-up docker-compose-down docker-compose-destroy \
+	docker-compose-start docker-compose-stop
 
 help:
 	@echo "Available commands:"
-	@echo "  make install       Install dependencies"
-	@echo "  make run           Run application"
-	@echo "  make test          Run tests"
-	@echo "  make clean         Remove virtual environment"
-	@echo "  make init-db       Initialize migrations"
-	@echo "  make migrate       Create migration"
-	@echo "  make upgrade       Apply migrations"
-	@echo "  make docker-build  Build Docker image"
-	@echo "  make docker-run    Run Docker container"
-	@echo "  make docker-stop   Stop Docker container"
-	@echo "  make docker-compose up   Build Docker containers"
-	@echo "  make docker-compose down   Destroy Docker containers"
-	@echo "  make docker-compose start   Start Docker containers"
-	@echo "  make docker-compose stop   Stop Docker containers"
+	@echo "  make install                Install dependencies"
+	@echo "  make run                    Run application locally"
+	@echo "  make test                   Run tests"
+	@echo "  make clean                  Remove virtual environment"
+	@echo "  make init-db                Initialize migrations"
+	@echo "  make migrate                Create a new migration"
+	@echo "  make upgrade                Apply migrations"
+	@echo "  make docker-build           Build Docker image"
+	@echo "  make docker-run             Run Docker container"
+	@echo "  make docker-stop            Stop Docker container"
+	@echo "  make docker-compose-up      Build and start all containers"
+	@echo "  make docker-compose-down    Stop containers (keeps the database volume)"
+	@echo "  make docker-compose-destroy Stop containers AND delete the database volume"
+	@echo "  make docker-compose-start   Start existing containers"
+	@echo "  make docker-compose-stop    Stop containers"
 
 venv:
 	python3 -m venv $(VENV)
@@ -48,14 +51,14 @@ init-db:
 	FLASK_APP=$(APP) $(FLASK) db init
 
 migrate:
-	FLASK_APP=$(APP) $(FLASK) db migrate -m "auto migration"
+	FLASK_APP=$(APP) $(FLASK) db migrate -m "$(MSG)"
 
 upgrade:
 	FLASK_APP=$(APP) $(FLASK) db upgrade
 
 clean:
 	rm -rf $(VENV)
-	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
 
 docker-build:
@@ -72,14 +75,17 @@ docker-stop:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 
-docker-compose up:
-	docker-compose up -d --build
+docker-compose-up:
+	docker compose up -d --build
 
-docker-compose down:
-	docker-compose down -v
+docker-compose-down:
+	docker compose down
 
-docker-compose start:
-	docker-compose start
+docker-compose-destroy:
+	docker compose down -v
 
-docker-compose stop:
-	docker-compose stop
+docker-compose-start:
+	docker compose start
+
+docker-compose-stop:
+	docker compose stop

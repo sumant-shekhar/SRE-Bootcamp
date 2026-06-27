@@ -1,19 +1,18 @@
-.venv
+# secrets — never commit this
 .env
+
+# python
+.venv/
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
-*.db
-*.sqlite3
-*.log
-*.bak
-*.swp
-instance/
-.mypy_cache/
+
+# migrations (optional — commit if you want migration history)
+# migrations/
+
+# pytest
 .pytest_cache/
-migrations/
+
+# editor
 .vscode/
-.env/
-data/
-database.ini
+.idea/

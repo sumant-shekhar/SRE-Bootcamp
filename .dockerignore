@@ -1,17 +1,29 @@
+# secrets — never copy into the image
+.env
+
+# python
 .venv/
-venv/
 __pycache__/
 *.pyc
 *.pyo
-*.db
-*.sqlite3
-instance/
-.env
+
+# git
 .git/
 .gitignore
+
+# docker files themselves
+.dockerignore
+docker-compose*.yml
+compose.yaml
+
+# tests — not needed in production image
+test_app.py
 .pytest_cache/
+
+# editor
 .vscode/
 .idea/
-tests/
-*.md
-migrations/versions/__pycache__/
+
+# docs
+README.md
+LICENSE

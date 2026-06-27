@@ -1,5 +1,5 @@
-# Build stage
-FROM python:3.14.6-slim-bookworm AS builder
+# Build stage 
+FROM python:3.12-slim-bookworm AS builder
 
 WORKDIR /app
 
@@ -12,8 +12,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Runtime stage
-FROM python:3.14.6-slim-bookworm AS runtime
+# Runtime stage 
+
+FROM python:3.12-slim-bookworm AS runtime
 
 WORKDIR /app
 
@@ -23,8 +24,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . .
 
-EXPOSE 4000
-
 RUN chmod +x entrypoint.sh
+
+RUN adduser --disabled-password --gecos "" appuser
+USER appuser
+
+EXPOSE 4000
 
 ENTRYPOINT ["./entrypoint.sh"]

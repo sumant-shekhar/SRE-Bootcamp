@@ -6,13 +6,8 @@ services:
     container_name: sre-bootcamp-app
     ports:
       - "4000:4000"
-    environment:
-      DB_USER: suman
-      DB_PASSWORD: admin
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: srebootcamp
-      DATABASE_URL: postgresql://suman:admin@db:5432/srebootcamp
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -21,12 +16,10 @@ services:
   db:
     image: postgres:17-alpine
     container_name: sre-bootcamp-db
-    environment:
-      POSTGRES_DB: srebootcamp
-      POSTGRES_USER: suman
-      POSTGRES_PASSWORD: admin
+    env_file:
+      - .env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U suman -d srebootcamp"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
