@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/your-username/sre-bootcamp:latest
     container_name: sre-bootcamp-app
     ports:
       - "4000:4000"
